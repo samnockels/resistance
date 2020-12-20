@@ -1,11 +1,1 @@
 Here is a super cool game
-
-## Dev locally
-
-Install Node
-```
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
-## restart your bash 
-nvm install 14.15.3
-```
-
