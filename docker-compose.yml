@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  web:
+    container_name: resistance-web
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/app
+    environment:
+      FLASK_ENV: development
+  db:
+    container_name: resistance-db
+    image: "mongo"
