@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  web:
+    container_name: resistance-web
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/app
+    environment:
+      GAME_MASTER_PASS: resistanceiscool
+      FLASK_ENV: development
+  frontend:
+    container_name: resistance-app
+    image: "node:14"
+    ports: 
+      - "3000:3000"
+    working_dir: /home/node/app
+    volumes:
+      - ./frontend:/home/node/app
+    command: "npm start"
+  db:
+    container_name: resistance-db
+    image: "mongo"
+    ports:
+      - "27017:27017"
