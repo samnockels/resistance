@@ -1,3 +1,4 @@
+import store
 
-def hello_world():
-    return "Hello World"
+def get_players():
+    return store.get_players()
