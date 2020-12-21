@@ -23,4 +23,4 @@ def enter(name):
 
 @app.route('/assign')
 def assign(): 
-  return jsonify(store.assign_role(store.get_players()[0]['_id'], 'spy').raw_result)
+  return jsonify(resistance.assign_roles())
