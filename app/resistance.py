@@ -1,5 +1,6 @@
 import store
 import random
+import math
 
 def assign_roles():
     data = {5:2, 6:2, 7:3, 8:3, 9:3, 10:4}
@@ -51,7 +52,7 @@ def vote_on_crew(vote):
         store.update_votes_for_crew(_id, vote) 
 
         if(len(players_already_voted)+1 == no_players):
-            return determine_vote_result()
+            return was_vote_approved()
             # return ['All players voted']
         else:
             return ['Not every player has voted']
@@ -60,8 +61,27 @@ def vote_on_crew(vote):
         return ['Player has already voted for the crew']
     
 
-def determine_vote_result():
+def was_vote_approved():
 
-    votes = store.get_crew_votes()
+    player_votes = store.get_crew_votes()
+    votes = player_votes.values()
 
-    return votes
+    no_votes = len(votes)
+    no_approvals_needed = no_votes/2
+
+    #Vote tie is a rejection
+    if(isinstance(no_approvals_needed, float)):
+        no_approvals_needed = math.ceil(no_approvals_needed)
+    else:
+        no_approvals_needed +=1
+
+    no_approves = 0
+
+    for vote in votes:
+        if vote == 'approve':
+            no_approves +=1
+
+    if no_approves >= no_approvals_needed:
+        return True
+    else:
+        return False
