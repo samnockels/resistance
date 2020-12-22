@@ -36,13 +36,13 @@ if __name__ == "__main__":
 # admin starts lobby
 # players join
 # admin starts game
-# assign roles
+# assign roles - done
 # frontend lets spys see eachother
-# initialize player_order & current_player
+# initialise player_order & current_player - done
 # game loop:
-# 1. current player picks crew
-#    - set game.crew_selection
-# 2. players vote on crew
+# 1. current player picks crew - done
+#    - set game.crew_selection - done
+# 2. players vote on crew - done
 # 3. if majority reject:
 #    - increment game.current_player_idx
 #    - goto 1
@@ -56,34 +56,34 @@ if __name__ == "__main__":
 #    - decide winner
 # 7. else goto 1
 
-game = {
-    missions = ['mission1']
-    player_order = ['alice', 'sam', 'conor']
-    current_player_idx = 0
-    crew_selection = 'crew1'
-}
+# game = {
+#     missions = ['mission1']
+#     player_order = ['alice', 'sam', 'conor']
+#     current_player_idx = 0
+#     crew_selection = 'crew1'
+# }
 
-players = {
-    id: str
-    name: str
-    role: spy resistance
-}
+# players = {
+#     id: str
+#     name: str
+#     role: spy resistance
+# }
 
-mission = {
-    id: 'mission1'
-    nocrew: 2
-    crew = {
-        'alice': 'success/fail'
-        'conor': 'success/fail'
-    }
-    result = 'success/fail'
-}
+# mission = {
+#     id: 'mission1'
+#     nocrew: 2
+#     crew = {
+#         'alice': 'success/fail'
+#         'conor': 'success/fail'
+#     }
+#     result = 'success/fail'
+# }
 
-crew = {
-    id: 'crew1'
-    crew = ['alice', 'conor']
-    approval = {
-        'sam': 'approve/reject'
-    }
-    result = 'approved/rejected'
-}
+# crew = {
+#     id: 'crew1'
+#     crew = ['alice', 'conor']
+#     approval = {
+#         'sam': 'approve/reject'
+#     }
+#     result = 'approved/rejected'
+# }
