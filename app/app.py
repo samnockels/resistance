@@ -32,6 +32,10 @@ def players():
 def create_game(info):
   return jsonify(resistance.create_game(info))
 
+@app.route('/list_games')
+def list_games():
+  return jsonify(store.get_games())
+
 @app.route('/join_game/<string:info>')
 def join_game(info):
   return jsonify(resistance.join_game(info))

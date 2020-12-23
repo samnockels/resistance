@@ -3,8 +3,9 @@ import uuid
 
 client = MongoClient('resistance-db', 27017)
 db = client.resistance
+admin = db.admin
 players = db.players
-game = db.game
+games = db.games
 mission = db.mission
 crew = db.crew
 
@@ -24,14 +25,14 @@ def id():
     return str(uid)
 
 def init_game_master_pass(p):
-    if games.count_documents({}) < 1:
-        games.insert_one({
+    if admin.count_documents({}) < 1:
+        admin.insert_one({
             "_id": "game-master-pass",
             "pass": p
         })
 
 def validate_game_master_pass(p):
-    return games.find_one({ "_id": "game-master-pass" })["pass"] == p
+    return admin.find_one({ "_id": "game-master-pass" })["pass"] == p
 
 #---------------------------------------#
 #-----------Create methods--------------#
@@ -98,6 +99,9 @@ def create_mission():
 #---------------------------------------#
 #------------GET methods----------------#
 #---------------------------------------#
+
+def get_games():
+    return list(games.find())
 
 def get_players():
     return list(players.find())
