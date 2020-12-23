@@ -24,14 +24,14 @@ def id():
     return str(uid)
 
 def init_game_master_pass(p):
-    if game.count_documents({}) < 1:
-        game.insert_one({
+    if games.count_documents({}) < 1:
+        games.insert_one({
             "_id": "game-master-pass",
             "pass": p
         })
 
 def validate_game_master_pass(p):
-    return game.find_one({ "_id": "game-master-pass" })["pass"] == p
+    return games.find_one({ "_id": "game-master-pass" })["pass"] == p
 
 #---------------------------------------#
 #-----------Create methods--------------#
@@ -41,7 +41,7 @@ def create_game(player_id, game_name):
     game_id=id()
     mission_id=id()
     crew_id = id()
-    game.insert_one({
+    games.insert_one({
         '_id': game_id,
         'game_name':game_name,
         'created_by':player_id,
@@ -55,7 +55,7 @@ def create_game(player_id, game_name):
 def initialise_players(player_ids):
     for player_id in player_ids:
         if(has_player_created_game(player_id) == True):
-            return game.update_one({'created_by': player_id}, {'$set':{'player_order':player_ids}})
+            return games.update_one({'created_by': player_id}, {'$set':{'player_order':player_ids}})
 
 def create_crew(crew_member_ids):
     crew_id = get_crew_id()
@@ -66,7 +66,7 @@ def create_crew(crew_member_ids):
         'result':'unassigned',
     })
 
-    game.update_one({'_id':'game_data'}, {'$set':{'crew_selection':crew_id}})
+    games.update_one({'_id':'game_data'}, {'$set':{'crew_selection':crew_id}})
 
 
 def create_player(name):
@@ -79,7 +79,7 @@ def create_player(name):
     }).inserted_id
 
 def create_mission():
-    mission_id = game.find_one({"_id":'game_data'})['mission'][0]
+    mission_id = games.find_one({"_id":'game_data'})['mission'][0]
     crew_members = get_crew()
     no_crew = len(crew_members)
 
@@ -124,7 +124,7 @@ def get_crew_votes():
     return votes
 
 def get_crew_id():
-    crew_id = game.find_one({"_id" : 'game_data'})['crew_selection']
+    crew_id = games.find_one({"_id" : 'game_data'})['crew_selection']
     return crew_id
 
 def get_crew():
@@ -145,7 +145,7 @@ def get_mission_votes():
     return set(mission_votes.values())
 
 def get_mission_id():
-    missions = game.find_one({'_id':'game_data'})['mission']
+    missions = games.find_one({'_id':'game_data'})['mission']
     current_mission_id = missions[-1]
     return current_mission_id
 
@@ -154,14 +154,14 @@ def get_no_mission_crew():
     return mission.find_one({"_id":mission_id})['no_crew']
 
 def get_game_id(player_id):
-    return game.find_one({"created_by":player_id})['_id']
+    return games.find_one({"created_by":player_id})['_id']
 
 #---------------------------------------#
 #-----------Update methods--------------#
 #---------------------------------------#
 
 def update_mission_crew(crew_ids):
-    return game.update_one({'_id': 'game_data'}, {'$set':{'crew_selection':crew_ids}})
+    return games.update_one({'_id': 'game_data'}, {'$set':{'crew_selection':crew_ids}})
 
 def update_votes_for_crew(_id, vote):
     crew_member_id = 'approval.' + _id
@@ -186,7 +186,7 @@ def assign_role(player_id, role):
     return players.update_one({ "_id": player_id }, { '$set': { 'role': role } })
 
 def select_next_player():
-    current_player_index = game.find_one({'_id':'game_data'})['current_player_idx']
+    current_player_index = games.find_one({'_id':'game_data'})['current_player_idx']
     next_player_index = current_player_index + 1
 
     no_players = get_no_players()
@@ -194,7 +194,7 @@ def select_next_player():
     if(next_player_index == no_players):
         next_player_index = 0
 
-    return game.update_one({'_id':'game_data'}, {'$set':{'current_player_idx':next_player_index}})
+    return games.update_one({'_id':'game_data'}, {'$set':{'current_player_idx':next_player_index}})
 
 def has_player_already_voted_mission(player_id):
     mission_id = get_mission_id()
@@ -211,8 +211,8 @@ def set_mission_result(result):
     return mission.update_one({'_id':mission_id}, {'$set':{'result':result}})
 
 def has_player_created_game(player_id):
-    if(game.find_one({'created_by':player_id})):
+    if(games.find_one({'created_by':player_id})):
         return True
 
 def join_game(player_id, game_name):
-    game.update_one({'game_name':game_name}, {'$push': {'player_order': {'$each': [player_id]}}})
+    games.update_one({'game_name':game_name}, {'$push': {'player_order': {'$each': [player_id]}}})
