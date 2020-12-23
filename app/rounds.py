@@ -38,20 +38,23 @@ if __name__ == "__main__":
 # admin starts game
 # assign roles - done
 # frontend lets spys see eachother
-# initialise player_order & current_player - done
+# initialise player_order  - done
+# select current_player
 # game loop:
 # 1. current player picks crew - done
 #    - set game.crew_selection - done
 # 2. players vote on crew - done
-# 3. if majority reject:
-#    - increment game.current_player_idx
-#    - goto 1
-# 4. if majority approve:
-#    - copy crew into mission
-#    - add mission id to game.missions
+# 3. if majority reject: - done
+#    - increment game.current_player_idx - done
+#    - select next player
+# 4. if majority approve: - done
+#    - copy crew into mission - done
+#    - add mission id to game.missions -done
 #    - give crew succeed/fail buttons depending on role
-#    - crew succeed/fail mission
-# 5. increment game.current_player_idx
+#    - crew succeed/fail mission - done
+#    - Calculate if mission succeeded or not - done
+#     - return number of fails from mission
+# 5. increment game.current_player_idx - done 
 # 6. if all missions complete:
 #    - decide winner
 # 7. else goto 1

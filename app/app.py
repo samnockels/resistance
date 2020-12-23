@@ -34,6 +34,10 @@ def crew_select(crew_member_ids):
 def crew_vote(vote): 
   return jsonify(resistance.vote_on_crew(vote))
 
+@app.route('/mission_vote/<string:mission_vote>')
+def mission_vote(mission_vote): 
+  return jsonify(resistance.vote_on_mission(mission_vote))
+
 @app.route('/test')
 def test():
-  return jsonify([store.get_number_votes_for_crew()])
+  return jsonify(resistance.vote_on_mission('4a6d540f-d2ca-4c5d-8c3d-312b3b8aab32&success'))
