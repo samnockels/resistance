@@ -28,12 +28,6 @@ def login():
 def players():
   return jsonify(store.get_players())
 
-@app.route('/', methods=['GET'])
-def hello_world():
-  return jsonify({
-    "players": store.get_players()
-  })
-
 @app.route('/create_game/<string:info>')
 def create_game(info):
   return jsonify(resistance.create_game(info))
