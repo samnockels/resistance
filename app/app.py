@@ -12,10 +12,18 @@ def hello_world():
     "players": store.get_players()
   })
 
-@app.route('/enter/<string:name>')
+@app.route('/create_game/<string:info>')
+def create_game(info):
+  return jsonify(resistance.create_game(info))
+
+@app.route('/join_game/<string:info>')
+def join_game(info):
+  return jsonify(resistance.join_game(info))
+
+@app.route('/create_player/<string:name>')
 def enter(name):
   return jsonify({
-    "uid": store.insert_player(name)
+    "uid": store.create_player(name)
   })
 
 @app.route('/assign')
@@ -34,6 +42,10 @@ def crew_select(crew_member_ids):
 def crew_vote(vote): 
   return jsonify(resistance.vote_on_crew(vote))
 
-@app.route('/test')
-def test():
-  return jsonify([store.get_number_votes_for_crew()])
+@app.route('/mission_vote/<string:mission_vote>')
+def mission_vote(mission_vote): 
+  return jsonify(resistance.vote_on_mission(mission_vote))
+
+# @app.route('/test')
+# def test():
+#   return jsonify(store.has_player_created_game())

@@ -1,10 +1,20 @@
 import store
 import random
+import math
 
+def create_game(info):
+    [player_id, game_name] = info.split('&')
+    return store.create_game(player_id, game_name)
+
+def join_game(info):
+    [player_id, game_name] = info.split('&')
+    return store.join_game(player_id, game_name)
+
+#Assign roles to players
 def assign_roles():
     data = {5:2, 6:2, 7:3, 8:3, 9:3, 10:4}
     players = store.get_players()
-    no_players = len(players)
+    no_players = store.get_no_players()
     player_index = list(range(0, no_players))
     no_spies = data[no_players]
     spy_index = random.sample(player_index, no_spies)
@@ -20,7 +30,7 @@ def assign_roles():
     for i, player in enumerate(players):
         store.assign_role(player.get('_id'), roles[i])
 
-# initialise player_order
+#Randomise order of players
 def initialise_player_order():
     players = store.get_players()
     random.shuffle(players)
@@ -31,37 +41,113 @@ def initialise_player_order():
     
     store.initialise_players(player_ids)
 
-#Initialise crew selected
+#Set up crew selected
 def crew_selection(crew_member_ids):
     crew_member_ids = crew_member_ids.split('&')
-    # store.update_mission_crew(crew_ids)
     store.create_crew(crew_member_ids)
 
-#Handle crew votes and when every person hasd voted on the crew return 'All players voted'
+#Handle crew votes
 #Only let a player vote for the crew once
+#If crew is approved call mission() otherwise select next player to choopse crew
 def vote_on_crew(vote):
     id_vote = vote.split('&')
     _id = id_vote[0]
     vote = id_vote[1]
 
-    no_players = int(len(store.get_players()))
+    no_players = store.get_no_players()
     players_already_voted = store.get_players_already_voted_for_crew()
 
     if(_id not in players_already_voted):
         store.update_votes_for_crew(_id, vote) 
 
         if(len(players_already_voted)+1 == no_players):
-            return determine_vote_result()
-            # return ['All players voted']
+            was_crew_vote_approved = was_vote_approved()
+            
+            if(was_crew_vote_approved == True):
+                store.update_crew_result('Approved')
+            else:
+                store.update_crew_result('Rejected')
+
+            #Crew was accepted
+            if(was_crew_vote_approved == True):
+                mission()
+            
+            #Select next player
+            store.select_next_player()
+            
         else:
             return ['Not every player has voted']
 
     else:
         return ['Player has already voted for the crew']
     
+#Return True if crew was approved and False if the crew was rejected
+def was_vote_approved():
 
-def determine_vote_result():
+    player_votes = store.get_crew_votes()
+    votes = player_votes.values()
 
-    votes = store.get_crew_votes()
+    no_votes = len(votes)
+    no_approvals_needed = no_votes/2
 
-    return votes
+    #Vote tie is a rejection
+    if(isinstance(no_approvals_needed, float)):
+        no_approvals_needed = math.ceil(no_approvals_needed)
+    else:
+        no_approvals_needed +=1
+
+    no_approves = 0
+
+    for vote in votes:
+        if vote == 'approve':
+            no_approves +=1
+
+    #If majority approve crew
+    if no_approves >= no_approvals_needed:
+        return True
+    #If majority reject crew
+    else:
+        return False
+
+#Create mission and send cards to players depending on their role
+def mission():
+    store.create_mission()
+
+    crew_members = store.get_crew()
+
+    for member in crew_members:
+        role = store.get_role(member)
+        
+        # if(role=='spy'):
+        #     #Give success and fail card
+        # else:
+        #     #Only give success card
+
+#Handle votes for the mission
+#Only let a crew member vote once
+def vote_on_mission(vote):
+    id_vote = vote.split('&')
+    _id = id_vote[0]
+    vote = id_vote[1]
+
+    has_player_already_voted = store.has_player_already_voted_mission(_id)
+
+    if(has_player_already_voted == True):
+        return ['Player has already voted for the mission']
+    else:
+        store.update_mission_vote(_id, vote)
+
+        mission_votes = store.get_mission_votes()
+
+        #If every crew member has voted update outcome of vote
+        if('unassigned' not in mission_votes):
+            if('fail' in mission_votes):
+                store.set_mission_result('fail')
+                return ['Mission failed']
+            else:
+                store.set_mission_result('success')
+                return ['Mission succeeded']
+
+        else:
+            return ['Not every crew member has voted']
+
