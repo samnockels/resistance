@@ -5,6 +5,7 @@ Flask-SocketIO==5.0.1
 itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
+pymongo==3.11.2
 python-engineio==4.0.0
 python-socketio==5.0.3
 websockets==8.1
