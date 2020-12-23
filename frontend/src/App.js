@@ -1,16 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import {
+  ChakraProvider,
+  Box,
+  Grid,
+  extendTheme
+} from '@chakra-ui/react';
+import GamesList from './components/GameList'
+import api, { ApiProvider } from './services/api'
 
-function App() {
+localStorage.setItem('chakra-ui-color-mode', 'dark')
+const customTheme = extendTheme({
+  initialColorMode: 'dark'
+})
+
+function App() {  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Hello World 🚀
-        </p>
-      </header>
-    </div>
+    <ChakraProvider theme={customTheme}>
+      <ApiProvider value={api}>
+        <Box textAlign="center" fontSize="xl">
+          <Grid minH="100vh" p={3}>
+            <GamesList />
+          </Grid>
+        </Box>
+      </ApiProvider>
+    </ChakraProvider>
   );
 }
 
