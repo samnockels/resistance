@@ -1,25 +1,29 @@
-import { useState } from 'react';
-import './App.css';
-import GameMasterAuth from './components/GameMasterAuth'
-// import Lobby from './components/Lobby'
-import io from 'socket.io-client';
+import React, { useState } from 'react';
+import {
+  ChakraProvider,
+  Box,
+  Grid,
+  extendTheme
+} from '@chakra-ui/react';
+import GamesList from './components/GameList'
+import api, { ApiProvider } from './services/api'
 
-const socket = io('localhost:5000');
-socket.on('connect', function(){console.log('connect')});
-socket.on('disconnect', function(){console.log('disconnect')});
-window.socket = socket
-socket.onAny((eventName, ...args) => {
-  console.log(eventName, args)
-});
-function App() {
-  const [page, setPage] = useState('login')
-  
+localStorage.setItem('chakra-ui-color-mode', 'dark')
+const customTheme = extendTheme({
+  initialColorMode: 'dark'
+})
+
+function App() {  
   return (
-    <div className="App">
-      <header className="App-header">
-        {page === 'login' && <GameMasterAuth onLogin={() => setPage('lobby')}/>}
-      </header>
-    </div>
+    <ChakraProvider theme={customTheme}>
+      <ApiProvider value={api}>
+        <Box textAlign="center" fontSize="xl">
+          <Grid minH="100vh" p={3}>
+            <GamesList />
+          </Grid>
+        </Box>
+      </ApiProvider>
+    </ChakraProvider>
   );
 }
 
