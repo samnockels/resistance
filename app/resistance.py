@@ -2,10 +2,19 @@ import store
 import random
 import math
 
+def create_game(info):
+    [player_id, game_name] = info.split('&')
+    return store.create_game(player_id, game_name)
+
+def join_game(info):
+    [player_id, game_name] = info.split('&')
+    return store.join_game(player_id, game_name)
+
+#Assign roles to players
 def assign_roles():
     data = {5:2, 6:2, 7:3, 8:3, 9:3, 10:4}
     players = store.get_players()
-    no_players = len(players)
+    no_players = store.get_no_players()
     player_index = list(range(0, no_players))
     no_spies = data[no_players]
     spy_index = random.sample(player_index, no_spies)
@@ -21,7 +30,7 @@ def assign_roles():
     for i, player in enumerate(players):
         store.assign_role(player.get('_id'), roles[i])
 
-# initialise player_order
+#Randomise order of players
 def initialise_player_order():
     players = store.get_players()
     random.shuffle(players)
@@ -32,14 +41,14 @@ def initialise_player_order():
     
     store.initialise_players(player_ids)
 
-#Initialise crew selected
+#Set up crew selected
 def crew_selection(crew_member_ids):
     crew_member_ids = crew_member_ids.split('&')
-    # store.update_mission_crew(crew_ids)
     store.create_crew(crew_member_ids)
 
-#Handle crew votes and when every person hasd voted on the crew return 'All players voted'
+#Handle crew votes
 #Only let a player vote for the crew once
+#If crew is approved call mission() otherwise select next player to choopse crew
 def vote_on_crew(vote):
     id_vote = vote.split('&')
     _id = id_vote[0]
@@ -72,7 +81,7 @@ def vote_on_crew(vote):
     else:
         return ['Player has already voted for the crew']
     
-
+#Return True if crew was approved and False if the crew was rejected
 def was_vote_approved():
 
     player_votes = store.get_crew_votes()
@@ -100,6 +109,7 @@ def was_vote_approved():
     else:
         return False
 
+#Create mission and send cards to players depending on their role
 def mission():
     store.create_mission()
 
@@ -113,6 +123,8 @@ def mission():
         # else:
         #     #Only give success card
 
+#Handle votes for the mission
+#Only let a crew member vote once
 def vote_on_mission(vote):
     id_vote = vote.split('&')
     _id = id_vote[0]
