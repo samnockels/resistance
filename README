@@ -1,1 +1,12 @@
 Here is a super cool game
+
+Start the server & db
+```
+docker-compose up -d
+```
+
+Start the frontend
+```
+cd frontend
+npm start
+```
