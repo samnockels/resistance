@@ -5,9 +5,8 @@ Start the server & db
 ```bash
 docker-compose up -d
 ```
-
 Start the frontend
-```
+```bash
 cd frontend
 npm start
 ```
