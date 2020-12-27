@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import uuid
+from enum import Enum
 
 client = MongoClient('resistance-db', 27017)
 db = client.resistance
@@ -8,6 +9,12 @@ players = db.players
 games = db.games
 mission = db.mission
 crew = db.crew
+
+class GameStatus(Enum):
+    NOT_STARTED = 0
+    IN_GAME = 1
+    FINISHED = 2
+
 
 def error(e):
     return {
@@ -49,7 +56,8 @@ def create_game(player_id, game_name):
         'mission':[mission_id],
         'player_order':[player_id],
         'current_player_idx':0,
-        'crew_selection':crew_id
+        'crew_selection':crew_id,
+        'status': GameStatus.NOT_STARTED.value
     })
 
 
@@ -70,12 +78,13 @@ def create_crew(crew_member_ids):
     games.update_one({'_id':'game_data'}, {'$set':{'crew_selection':crew_id}})
 
 
-def create_player(name):
+def create_player(name, avatar):
     if (players.count_documents({ "name": name }) > 0):
         return error('player-name-already-exists')
     return players.insert_one({
         "_id": id(),
         "name": name,
+        "avatar": avatar,
         "role": "unassigned"
     }).inserted_id
 
@@ -106,12 +115,21 @@ def get_games():
 def get_players():
     return list(players.find())
 
+def get_player(id):
+    results = list(players.find({ "_id": id }))
+    if(len(results) == 0): 
+        return False
+    return results[0]
+
 def get_no_players():
     players = get_players()
     return len(players)
 
 def get_player_id(name):
     return players.find_one({"name" : name})['_id']
+
+def name_is_available(name):
+    return players.count_documents({ 'name': name }) == 0
 
 def get_next_crew_number():
     return crew.count()
@@ -181,6 +199,13 @@ def update_mission_vote(player_id, vote):
     mission_id = get_mission_id()
     crew_member_id = 'crew.' + player_id
     return mission.update_one({'_id':mission_id}, {'$set':{crew_member_id:vote}})
+
+#---------------------------------------#
+#------------Delete methods-------------#
+#---------------------------------------#
+
+def delete_player(player_id):
+    players.delete_one({ '_id': player_id })
 
 #---------------------------------------#
 #------------Other methods--------------#

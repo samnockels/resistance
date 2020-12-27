@@ -2,8 +2,7 @@ import store
 import random
 import math
 
-def create_game(info):
-    [player_id, game_name] = info.split('&')
+def create_game(player_id, game_name):
     return store.create_game(player_id, game_name)
 
 def join_game(info):
