@@ -78,15 +78,18 @@ def create_crew(crew_member_ids):
     games.update_one({'_id':'game_data'}, {'$set':{'crew_selection':crew_id}})
 
 
-def create_player(name, avatar):
+def create_player(name, avatar, isAdmin = False):
     if (players.count_documents({ "name": name }) > 0):
         return error('player-name-already-exists')
-    return players.insert_one({
+    player = {
         "_id": id(),
         "name": name,
         "avatar": avatar,
         "role": "unassigned"
-    }).inserted_id
+    }
+    if (isAdmin == True):
+        player['isAdmin'] = True
+    return players.insert_one(player).inserted_id
 
 def create_mission():
     mission_id = games.find_one({"_id":'game_data'})['mission'][0]

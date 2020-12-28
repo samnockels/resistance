@@ -58,14 +58,14 @@ def check_name(name):
     "available": store.name_is_available(name)
   })
 
-
-
 @app.route('/enter', methods=['post'])
 def enter():
   player = util.get_request_body()
 
+  isAdmin = False
   name = player.get('name')
   avatar = player.get('avatar')
+  adminPassword = player.get('adminPassword')
 
   if(not name):
     return util.error('name-invalid', 'Please provide a name!')
@@ -74,13 +74,20 @@ def enter():
     letters = 'qwertyuiopasdfghjklzxcvbnm'
     avatar = 'https://avatars.dicebear.com/api/bottts/'+''.join(random.choice(letters) for i in range(10))+'.svg'
   
+  if(adminPassword):
+    passwordValid = store.validate_game_master_pass(adminPassword)
+    if(passwordValid):
+      isAdmin = True
+    else:
+      return util.error('password-invalid', 'Password incorrect!')
+
   if(len(name) < 3):
     return util.error('name-invalid', 'Name must be at least 3 characters long!')
   
   if (not store.name_is_available(name)):
     return util.error('player-name-already-exists', 'That player name already exists!')
   
-  player_id = store.create_player(name, avatar)
+  player_id = store.create_player(name, avatar, isAdmin=isAdmin)
   
   return jsonify({
     "token": crypto.encrypt(player_id),
