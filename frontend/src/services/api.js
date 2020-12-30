@@ -5,6 +5,10 @@ import { axiosInstance } from './http'
 
 const axios = axiosInstance()
 
+/**
+ * 
+ */
+
 function getGameStatus(status){
     if (status === 0) return 'not-started'
     if (status === 1) return 'in-game'
@@ -31,7 +35,7 @@ async function enterPlayer(name, avatar, opts = {}) {
     if (opts && opts.adminPassword) {
         body.adminPassword = opts.adminPassword
     }
-    const res = await axios.post(`/enter`, { body })
+    const res = await axios.post(`/enter`, body)
     if(res.data.error) handleErrorResponse(res.data.error)
     sessionStorage.setItem('token', res.data.token)
     return res.data
@@ -87,9 +91,11 @@ async function getGames() {
     return res.data.map(formatGame)
 }
 
-async function createGame(config) {
-    const name = config.name
-    const res = await axios.get(`/create_game/d8ab9c75-9e02-4a48-83b3-ba73b1ab60e2&${name}`)
+async function createGame(name, game) {
+    const res = await axios.post(`/create_game`,{
+        name,
+        game
+    })
     if(res.data.error) handleErrorResponse(res.data.error)
     return res.data
 }

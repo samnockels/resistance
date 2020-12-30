@@ -11,16 +11,17 @@ import {
 	HStack,
 	Spinner,
 	Badge,
-	propNames,
-	TableCaption,
-	Avatar
+	Text, 
+	Avatar,
+	Flex
 } from '@chakra-ui/react';
 import CreateGameModal from './CreateGameModal';
 import { ApiContext } from '../services/api'
 import { handleError } from '../utils'
+import { StarIcon } from '@chakra-ui/icons';
 
 const REFRESH_PLAYERS_INTERVAL_MS = 5000
-const NUM_COLUMNS = 2
+const NUM_COLUMNS = 1
 
 function GameLobby({ game, leave }) {
 	const [players, setPlayers] = useState([])
@@ -64,13 +65,17 @@ function GameLobby({ game, leave }) {
 					<Tr>
 						<Th colSpan={NUM_COLUMNS}>
 							<HStack justifyContent='space-between'>
-								<span>{game.game_name} Lobby</span>
+								<Button onClick={() => leave()} size='sm'>Leave</Button>
+								<span>{game.name} Lobby</span>
 								<Badge>Resistance</Badge>
 							</HStack>
 						</Th>
 					</Tr>
 					<Tr>
-						<Th colSpan={2}>Player</Th>
+						<Th>Player</Th>
+					</Tr>
+					<Tr>
+						<Th>{game.created_by}</Th>
 					</Tr>
 				</Thead>
 				<Tbody>
@@ -81,12 +86,11 @@ function GameLobby({ game, leave }) {
 								? players.map(player => (
 									<Tr key={player._id}>
 										<Td w={50} p={'15px'}>
-											{<Avatar w={50} src={player.avatar} background='transparent' />}
-										</Td>
-										<Td>
-											{player.name}
-											{player.isAdmin ? '*' : ''}
-											{game.created_by === player._id ? '%' : ''}
+											<Flex alignItems='center'>
+												{<Avatar w={50} src={player.avatar} background='transparent' />}
+												<Text mx={3}>{player._id}</Text>
+												{game.created_by === player._id && <StarIcon color='gold' />}
+											</Flex>
 										</Td>
 									</Tr>
 								))
@@ -100,11 +104,6 @@ function GameLobby({ game, leave }) {
 						)
 					}
 				</Tbody>
-				<TableCaption>
-					<Button onClick={() => leave()}>
-						Leave Lobby
-					</Button>
-				</TableCaption>
 			</Table>
 
 		</VStack>

@@ -16,6 +16,7 @@ import {
 	InputGroup,
 	InputRightElement,
 	IconButton,
+	Select,
 } from '@chakra-ui/react';
 import { RepeatIcon } from '@chakra-ui/icons'
 import { Formik, Form, Field } from 'formik'
@@ -33,7 +34,7 @@ function CreateGameModal(props) {
 	
 	const onSubmit = async (values, actions) => {
 		try {
-			await createGame(values)
+			await createGame(values.name, values.game)
 			props.afterCreate()
 		} catch (e) {
 			onClose()
@@ -72,6 +73,17 @@ function CreateGameModal(props) {
 														</InputRightElement>
 													</InputGroup>
 													<FormErrorMessage>{form.errors.name}</FormErrorMessage>
+												</FormControl>
+											)}
+										</Field>
+										<Field name="game">
+											{({ field, form }) => (
+												<FormControl isInvalid={form.errors.game && form.touched.game} mt={4}>
+													<FormLabel htmlFor="game">Game</FormLabel>
+													<Select defaultValue="resistance">
+														<option value="resistance">Resistance</option>
+													</Select>
+													<FormErrorMessage>{form.errors.game}</FormErrorMessage>
 												</FormControl>
 											)}
 										</Field>

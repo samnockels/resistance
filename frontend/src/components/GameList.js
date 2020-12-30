@@ -14,6 +14,7 @@ import {
 import CreateGameModal from './CreateGameModal';
 import { ApiContext } from '../services/api'
 import { handleError } from '../utils'
+import { AppContext } from '../App';
 
 const REFRESH_GAMES_INTERVAL_MS = 5000 
 const NUM_COLUMNS = 4
@@ -31,6 +32,7 @@ function GamesList({ join }) {
 	const [games, setGames] = useState([])
 	const [loading, setLoading] = useState(true)
 	const { getGames, getPlayer } = useContext(ApiContext)
+	const { player } = useContext(AppContext)
 
 	const loadGames = async () => {
 		try {
@@ -65,7 +67,7 @@ function GamesList({ join }) {
 	return (
 		<VStack justifyContent="center">
 			<Table variant="simple"
-				maxW="80vw"
+				maxW="800px"
 				border="1px solid #2d3848"
 				borderRadius={10}>
 				<Thead width='100%'>
@@ -73,7 +75,7 @@ function GamesList({ join }) {
 						<Th colSpan={NUM_COLUMNS}>
 							<HStack justifyContent='space-between'>
 								<span>Games</span>
-								<CreateGameModal afterCreate={() => loadGames()} />
+								{player.isAdmin && <CreateGameModal afterCreate={() => loadGames()} />}
 							</HStack>
 						</Th>
 					</Tr>
@@ -91,7 +93,7 @@ function GamesList({ join }) {
 							games.length > 0
 								? games.map(game => (
 									<Tr key={game._id}>
-										<Td>{game.game_name}</Td>
+										<Td>{game.name}</Td>
 										<Td><Badge>Resistance</Badge></Td>
 										<Td><GameStatus status={game.status}/></Td>
 										<Td textAlign='right'>

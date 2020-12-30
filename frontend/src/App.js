@@ -28,15 +28,9 @@ import Enter from './components/Enter'
 import { history } from './utils'
 import { ApiContext } from './services/api';
 
-// import io from 'socket.io-client';
-
-// const socket = io('localhost:5000');
-// socket.on('connect', function(){console.log('connect')});
-// socket.on('disconnect', function(){console.log('disconnect')});
-// window.socket = socket
-// socket.onAny((eventName, ...args) => {
-//   console.log('<-- ',eventName, ...args)
-// });
+import { socket, send } from './services/socket'
+window.send = send
+window.socket = socket
 
 const pages = {
   LOADING: '/loading',
@@ -45,6 +39,10 @@ const pages = {
   GAMES: '/games',
   LOBBY: '/lobby'
 }
+
+
+
+
 
 function LoggedInContainer(props) {
   const { whoAmI } = useContext(ApiContext)
@@ -61,6 +59,10 @@ function LoggedInContainer(props) {
 
   return loading ? null : props.children
 }
+
+export const AppContext = React.createContext({
+  player: null
+})
 
 function App(props) {
   const { whoAmI, logout } = useContext(ApiContext)
@@ -105,77 +107,76 @@ function App(props) {
     return setPage(pages.ENTER)
   }
 
-  const navbar = () => {
-    if (page === pages.LOADING || page === pages.ENTER || !page) {
-      return null
-    }
-    return (
-      <HStack
-        position='absolute'
-        height={70}
-        top={0} left={0} right={0}
-        padding='5px'
-        justifyContent='space-between'
-        bgColor='#1d2531'
-      >
-        <Button onClick={onLogout} mr={2}>
-          <ArrowBackIcon />
-        </Button>
-        <HStack>
-          {player.isAdmin ? <StarIcon color='gold' /> : ''}
-          <Text ml={5}>{player.name}</Text>
-        </HStack>
-        <Avatar src={player.avatar} background='transparent' />
-      </HStack>
-    )
-  }
-
   const ContainerWithNav = (props) => {
     return (
       <>
-        {navbar()}
-        <Box mt={105}>
+        <HStack
+          width={'100%'}
+          padding='5px 10px'
+          justifyContent='space-between'
+          bgColor='#1d2531'
+        >
+          <Button onClick={onLogout} mr={2} size='sm'>
+            Logout
+          </Button>
+          <HStack>
+            {player.isAdmin ? <StarIcon color='gold' /> : ''}
+            <Text ml={5}>{player.name}</Text>
+          </HStack>
+          <Avatar src={player.avatar} background='transparent' />
+        </HStack>
+        <Box mt={50} mb={100}>
           {props.children}
         </Box>
       </>
     )
   }
 
+  const getAppContext = () => {
+    return {
+      player
+    }
+  }
+
   return (
-    <Box minH='100vh' width='100%'>
-      <Switch>
-        <Route exact path="/admin">
-          <Enter onEnter={checkAuth} isAdminLogin />
-        </Route>
-
-        <Route exact path="/enter">
-          <Enter onEnter={checkAuth} />
-        </Route>
-
-        <Route exact path="/">
-          <Redirect to="/enter" />
-        </Route>
-
-        <LoggedInContainer>
-          <Route exact path="/games">
-            <ContainerWithNav>
-              <GamesList join={onJoin} />
-            </ContainerWithNav>
+    <AppContext.Provider value={getAppContext()}>
+      <Box minH='100vh' width='100%'>
+        <Switch>
+          <Route exact path="/admin">
+            <Enter onEnter={checkAuth} isAdminLogin />
           </Route>
 
-          <Route exact path="/lobby">
-            <ContainerWithNav>
-            </ContainerWithNav>
-              <GameLobby game={game} leave={onLeave} />
+          <Route exact path="/enter">
+            <Enter onEnter={checkAuth} />
           </Route>
-        </LoggedInContainer>
 
-        <Route>
-          404
+          <Route exact path="/">
+            <Redirect to="/enter" />
+          </Route>
+
+          <LoggedInContainer>
+            <ContainerWithNav>
+              <Route exact path="/games">
+                <GamesList join={onJoin} />
+              </Route>
+
+              <Route exact path="/lobby">
+                <GameLobby game={game} leave={onLeave} />
+              </Route>
+            </ContainerWithNav>
+          </LoggedInContainer>
+
+          <Route>
+            404
         </Route>
-      </Switch>
-    </Box>
+        </Switch>
+      </Box>
+    </AppContext.Provider>
   );
 }
 
-export default App;
+function Lol() {
+  return 'alice is cool'
+}
+
+export default Lol;
