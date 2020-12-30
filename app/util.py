@@ -45,9 +45,6 @@ def error(id, message):
     })
 
 
-def get_request_body():
-    return request.json
-
 # return [isValid, errors]
 
 
