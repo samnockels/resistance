@@ -28,9 +28,7 @@ import Enter from './components/Enter'
 import { history } from './utils'
 import { ApiContext } from './services/api';
 
-import { socket, send } from './services/socket'
-window.send = send
-window.socket = socket
+import './services/socket'
 
 const pages = {
   LOADING: '/loading',

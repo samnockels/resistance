@@ -1,10 +1,3 @@
-from flask_socketio import emit, join_room, leave_room, Blueprint
-from server import socketio
-
-
-@socketio.on('hello')
-def hello(*args):
-    emit('helloworld', args)
 
 # @socketio.on('connect')
 # def test_connect():
