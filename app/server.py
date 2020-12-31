@@ -20,7 +20,7 @@ def init():
     init_game_master_pass(os.environ['GAME_MASTER_PASS'])
 
     # register http routes
-    print('1. registring routess')
+    print('1. registring routes')
     app.register_blueprint(routes.auth.app, url_prefix='/')
     app.register_blueprint(routes.game.app, url_prefix='/game')
     app.register_blueprint(routes.player.app, url_prefix='/player')
@@ -34,7 +34,7 @@ def init():
         return response
 
     # register socket events
-    print('2. registring evenasfasfasfst1s11sssssssssssssssss')
+    print('2. registring events')
     import core.events
     import resistance.events
 
@@ -43,4 +43,4 @@ def init():
 
 init()
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000)
