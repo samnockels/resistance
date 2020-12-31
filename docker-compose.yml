@@ -7,9 +7,6 @@ services:
       - "5000:5000"
     volumes:
       - ./app:/app
-    environment:
-      GAME_MASTER_PASS: resistanceiscool
-      FLASK_ENV: development
   # frontend:
   #   container_name: resistance-app
   #   image: "node:14"

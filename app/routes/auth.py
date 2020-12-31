@@ -1,8 +1,5 @@
 from flask import Flask, jsonify, request, session, Blueprint
-import resistance
-import store
-import util
-import crypto
+from util import http, crypto
 
 #
 # Auth routes at '/'
@@ -13,7 +10,7 @@ app = Blueprint('auth', __name__)
 
 @app.route('/enter', methods=['POST'])
 def enter():
-    [isValid, errors] = util.validate(request.json, {
+    [isValid, errors] = http.validate(request.json, {
         'name': {
             'type': 'string',
             'minlength': 3
@@ -37,11 +34,11 @@ def enter():
     adminPassword = player.get('adminPassword')
 
     if (not store.name_is_available(name)):
-        return util.error('player-name-already-exists', 'That player name already exists!')
+        return http.error('player-name-already-exists', 'That player name already exists!')
 
     if(adminPassword):
         if(not store.validate_game_master_pass(adminPassword)):
-            return util.error('password-invalid', 'Password incorrect!')
+            return http.error('password-invalid', 'Password incorrect!')
         isAdmin = True
 
     player_id = store.create_player(name, avatar, isAdmin=isAdmin)
@@ -62,7 +59,7 @@ def check_name(name):
 
 
 @app.route('/whoami', methods=['GET'])
-@util.login_required
+@http.login_required
 def whoAmI(player_id):
     player = store.get_player(player_id)
     return jsonify({
@@ -71,7 +68,7 @@ def whoAmI(player_id):
 
 
 @app.route('/logout')
-@util.login_required
+@http.login_required
 def logout(player_id):
     store.delete_player(player_id)
     return jsonify({

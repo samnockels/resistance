@@ -1,8 +1,6 @@
 from flask import Flask, jsonify, request, session, Blueprint
-import resistance
-import store
-import util
-import crypto
+from resistance import core, store
+from util import http, crypto
 
 #
 # Player routes at '/player'
@@ -12,7 +10,7 @@ app = Blueprint('player', __name__)
 
 
 @app.route('/<string:id>', methods=['GET'])
-@util.login_required
+@http.login_required
 def get_player(player_id, id):
     player = store.get_player(id)
     if(not player):
@@ -21,6 +19,6 @@ def get_player(player_id, id):
 
 
 @app.route('/list', methods=['GET'])
-@util.login_required
+@http.login_required
 def list_players(player_id):
     return jsonify(store.get_players())

@@ -1,6 +1,6 @@
 import random
 import math
-import store
+from resistance import store
 
 
 def create_game(player_id, name, game):
