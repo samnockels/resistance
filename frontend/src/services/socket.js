@@ -9,7 +9,7 @@ socket.on('disconnect', function () { console.log('disconnect') });
  * Send a message to the server
  */
 export const send = (event, data) => {
-  return socket.emit(event, {
+  socket.emit(event, {
     data,
     auth: sessionStorage.getItem('token')
   })
