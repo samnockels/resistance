@@ -30,9 +30,9 @@ def login_required(f):
             player = store.get_player(player_id)
             if (not player):
                 return unauthorized('player not found')
-            return f(player_id, *args, **kwargs)
         except Exception as e:
             return unauthorized(str(e))
+        return f(player_id, *args, **kwargs)
     return decorated_function
 
 
