@@ -92,7 +92,16 @@ async function getGames() {
 }
 
 async function createGame(name, game) {
-    const res = await axios.post(`/create_game`,{
+    const res = await axios.post(`/game/create`,{
+        name,
+        game
+    })
+    if(res.data.error) handleErrorResponse(res.data.error)
+    return res.data
+}
+
+async function joinGame(name, game) {
+    const res = await axios.post(`/game/join`,{
         name,
         game
     })
@@ -114,5 +123,6 @@ export default {
     getPlayers,
     getPlayer,
     getGames,
-    createGame
+    createGame,
+    joinGame
 }
