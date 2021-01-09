@@ -8,6 +8,8 @@ import {
     Spinner,
     Button,
     SlideFade,
+    Fade,
+    Text
 } from '@chakra-ui/react';
 
 const config = () => ({
@@ -93,15 +95,15 @@ const splitPlayersIntoRows = (players) => {
 const missions = [
     {
         _id: "1",
-        status: "success",
+        status: "notStarted",
     },
     {
         _id: "2",
-        status: "success",
+        status: "notStarted",
     },
     {
         _id: "3",
-        status: "fail",
+        status: "notStarted",
     },
     {
         _id: "4",
@@ -111,10 +113,6 @@ const missions = [
         _id: "5",
         status: "notStarted",
     },
-    {
-        _id: "6",
-        status: "notStarted",
-    }
 ]
 
 const playerStyle = {
@@ -153,7 +151,7 @@ const isTurnStyle = {
 
 function Player({ player, width, height, isTurn }) {
     return (
-        <Box w={width || 200} h={height || 240} {...playerStyle[player.type || config().UNKNOWN_ROLE]} m='25px' {...isTurn ? isTurnStyle:{}}>
+        <Box w={width || 200} h={height || 240} {...playerStyle[player.type || config().UNKNOWN_ROLE]} m='35px' {...isTurn ? isTurnStyle:{}}>
             <Flex h={'100%'} alignItems='center' justifyContent="center">
                 {player.name}
             </Flex>
@@ -206,13 +204,50 @@ function PlayerGrid({ currentPlayer }) {
     )
 }
 
-function StartView({ players, me, currentPlayer }){    
+function StartView({ players, me, currentPlayer, start, starting }){    
     return (
         <VStack h='100%' justifyContent='center'>
             <PlayerGrid players={players} currentPlayer={currentPlayer}/>
-            <Box pt={350}>
+            <Box py={20}>
                 <Me player={me} isTurn={myIndex() === currentPlayer} />
             </Box>
+            {user.isHost && (
+                <Button onClick={() => start()} isLoading={starting} size="lg" colorScheme="blue" py={10} px={20}>
+                    START
+                </Button>
+            )}
+        </VStack>
+    )
+}
+
+function GameView({ players, me, currentPlayer }){    
+    return (
+        <VStack h='100%' justifyContent='center'>
+            <PlayerGrid players={players} currentPlayer={currentPlayer}/>
+            <Box py={20}>
+                <Me player={me} isTurn={myIndex() === currentPlayer} />
+            </Box>
+            <HStack h={150}>
+                {missions.map((mission, idx) => <Mission mission={mission} missionNo={idx + 1} />)}
+            </HStack>
+        </VStack>
+    )
+}
+
+
+function CrewVoteView({ players, me, currentPlayer }){    
+    return (
+        <VStack h='100%' justifyContent='center'>
+            <PlayerGrid players={players} currentPlayer={currentPlayer}/>
+            <HStack>
+                <Box py={20} pr={'200px'}>
+                    <Me player={me} isTurn={myIndex() === currentPlayer} />
+                </Box>
+                <CrewVote />
+            </HStack>
+            <HStack h={150}>
+                {missions.map((mission, idx) => <Mission mission={mission} missionNo={idx + 1} />)}
+            </HStack>
         </VStack>
     )
 }
@@ -221,14 +256,14 @@ function RevealRolesView({ players, me, onRolesRevealed }){
     const [roles, setRoles] = useState(false)    
     function revealRoles() {
         const roles = {
-            role: 'spy',
+            role: Math.round(Math.random()) ? 'resistance' : 'spy',
             otherSpies: [
                 '2',
                 '9'
             ]
         }
         return new Promise((resolve, reject) => {
-            setTimeout(() => resolve(roles), 500)
+            setTimeout(() => resolve(roles), 2000)
         })
     }
 
@@ -244,12 +279,12 @@ function RevealRolesView({ players, me, onRolesRevealed }){
 
     return (
         <VStack h='100%' justifyContent='center'>
-            <SlideFade in={roles} offsetY="250px" unmountOnExit={true} transition={{duration: 5}}>
+            <SlideFade in={roles} offsetY="250px" unmountOnExit={true}>
                 <VStack>
                     <HStack justifyContent='center'>
                         <Me player={me}/>
                         <Flex maxW="600px" flexWrap="wrap" justifyContent="center">
-                            {roles.otherSpies && roles.otherSpies.map(spy => (
+                            {roles.role === 'spy' && roles.otherSpies && roles.otherSpies.map(spy => (
                                 <Player player={{
                                     ...players.find(p => p._id === spy),
                                     type: 'spy'
@@ -257,11 +292,16 @@ function RevealRolesView({ players, me, onRolesRevealed }){
                                 ))}
                         </Flex>
                     </HStack>
+                    {roles && (
+                        <Text fontSize="4xl" pt={100} color={playerStyle[roles.role].borderColor}>
+                            {roles.role === 'spy' ? 'You are a Spy 🕵️' : 'You are the Resistance'}
+                        </Text>
+                    )}
                 </VStack>
             </SlideFade>
             {!roles && (
                 <Box>
-                    Shhhhh....
+                    <Text fontSize="4xl">Shhhhh....</Text>
                 </Box>
             )}
         </VStack>
@@ -272,7 +312,7 @@ const View = {
     START: 'start',
     REVEAL_ROLES: 'reveal_roles',
     GAME: 'game',
-    REVEAL_ROLES: 'reveal_roles',
+    CREW_VOTE: 'crew_vote',
     REVEAL_ROLES: 'reveal_roles',
     REVEAL_ROLES: 'reveal_roles',
     REVEAL_ROLES: 'reveal_roles',
@@ -280,7 +320,7 @@ const View = {
 }
 
 function Resistance() {
-    const [view, setView] = useState(View.START)
+    const [view, _setView] = useState(View.START)
     const [starting, setStarting] = useState(false)
     const [currentPlayer, setCurrentPlayer] = useState(0)
 
@@ -290,6 +330,13 @@ function Resistance() {
         players: otherPlayers, 
         me,
         currentPlayer
+    }
+
+    const setView = (newView, timeout) => {
+        _setView(false)
+        setTimeout(() => {
+            _setView(newView)
+        }, 500)
     }
 
     function start() {
@@ -317,28 +364,31 @@ function Resistance() {
                 }
             })
         }
-        setTimeout(() => {
-            setView(View.GAME)
-        }, 4000)
+        setTimeout(() => setView(View.GAME), 5000)
+    }
+
+    function onCrewSelect() {
+        setView(View.CREW_VOTE)
     }
 
 	return (
 		<Center pos='absolute' top={0} left={0} bottom={0} right={0}>
-            {view === View.START && <StartView {...common} />}
-            {view === View.REVEAL_ROLES && <RevealRolesView {...common} onRolesRevealed={(roles) => onRolesRevealed(roles)}/>}
-            {view === View.GAME && <StartView {...common} />}
-            {/* <HStack h={150}>
-                {missions.map((mission, idx) => <Mission mission={mission} missionNo={idx + 1} />)}
-            </HStack> */}
-            {/* <HStack>
-                <CrewVote />
-            </HStack> */}
-            {user.isHost && (
-                <HStack pos='absolute' left={0} right={0} bottom={0}>
-                    {view === View.START && <Button onClick={() => start()} isLoading={starting}>Start Game</Button>}
-                    <Button onClick={() => nextTurn()} >++</Button>
-                </HStack>
-            )}
+            <Fade in={view === View.START} unmountOnExit>
+                <StartView {...common} start={start} starting={starting} />
+            </Fade>
+            <Fade in={view === View.REVEAL_ROLES} unmountOnExit>
+                <RevealRolesView {...common} onRolesRevealed={(roles) => onRolesRevealed(roles)}/>
+            </Fade>
+            <Fade in={view === View.GAME} unmountOnExit>
+                <GameView {...common} />
+            </Fade>
+            <Fade in={view === View.CREW_VOTE} unmountOnExit>
+                <CrewVoteView {...common} />
+            </Fade>
+            <Button pos='absolute' bottom={0} left={0} onClick={() => onCrewSelect()}>
+                Crew Vote
+            </Button>
+            
 		</Center>
 	);
 }
