@@ -25,6 +25,7 @@ import { ArrowBackIcon, StarIcon } from '@chakra-ui/icons';
 import GamesList from './components/GameList'
 import GameLobby from './components/GameLobby'
 import Enter from './components/Enter'
+import Resistance from './resistance/Resistance'
 import { history } from './utils'
 import { ApiContext } from './services/api';
 
@@ -63,84 +64,85 @@ export const AppContext = React.createContext({
 })
 
 function App(props) {
-  const { whoAmI, logout } = useContext(ApiContext)
-  const [player, setPlayer] = useState(false)
-  const [game, setGame] = useState(false)
-  let location = useLocation()
-  const page = location.pathname
+  // const { whoAmI, logout } = useContext(ApiContext)
+  // const [player, setPlayer] = useState(false)
+  // const [game, setGame] = useState(false)
+  // let location = useLocation()
+  // const page = location.pathname
 
-  console.log(page)
+  // console.log(page)
 
-  const setPage = history.push
+  // const setPage = history.push
 
-  const checkAuth = async () => {
-    const player = await whoAmI()
-    if (!player) {
-      if ([pages.ADMIN, pages.ENTER].includes(page)) {
-        return
-      }
-      return setPage(pages.ENTER)
-    }
-    setPlayer(player)
-    if ([pages.ADMIN, pages.ENTER, pages.LOADING].includes(page)) {
-      setPage(pages.GAMES)
-    }
-  }
+  // const checkAuth = async () => {
+  //   const player = await whoAmI()
+  //   if (!player) {
+  //     if ([pages.ADMIN, pages.ENTER].includes(page)) {
+  //       return
+  //     }
+  //     return setPage(pages.ENTER)
+  //   }
+  //   setPlayer(player)
+  //   if ([pages.ADMIN, pages.ENTER, pages.LOADING].includes(page)) {
+  //     setPage(pages.GAMES)
+  //   }
+  // }
 
-  useEffect(checkAuth, [])
+  // useEffect(checkAuth, [])
 
-  const onJoin = async (game) => {
-    setGame(game)
-    setPage(pages.LOBBY)
-  }
+  // const onJoin = async (game) => {
+  //   setGame(game)
+  //   setPage(pages.LOBBY)
+  // }
 
-  const onLeave = async () => {
-    setPage(pages.GAMES)
-    setGame(false)
-  }
+  // const onLeave = async () => {
+  //   setPage(pages.GAMES)
+  //   setGame(false)
+  // }
 
-  const onLogout = async () => {
-    await logout()
-    if (player.isAdmin) return setPage(pages.ADMIN)
-    return setPage(pages.ENTER)
-  }
+  // const onLogout = async () => {
+  //   await logout()
+  //   if (player.isAdmin) return setPage(pages.ADMIN)
+  //   return setPage(pages.ENTER)
+  // }
 
-  const ContainerWithNav = (props) => {
-    return (
-      <>
-        <HStack
-          width={'100%'}
-          padding='5px 10px'
-          justifyContent='space-between'
-          bgColor='#1d2531'
-        >
-          <Button onClick={onLogout} mr={2} size='sm'>
-            Logout
-          </Button>
-          <HStack>
-            {player.isAdmin ? <StarIcon color='gold' /> : ''}
-            <Text ml={5}>{player.name}</Text>
-          </HStack>
-          <Avatar src={player.avatar} background='transparent' />
-        </HStack>
-        <Box mt={50} mb={100}>
-          {props.children}
-        </Box>
-      </>
-    )
-  }
+  // const ContainerWithNav = (props) => {
+  //   return (
+  //     <>
+  //       <HStack
+  //         width={'100%'}
+  //         padding='5px 10px'
+  //         justifyContent='space-between'
+  //         bgColor='#1d2531'
+  //       >
+  //         <Button onClick={onLogout} mr={2} size='sm'>
+  //           Logout
+  //         </Button>
+  //         <HStack>
+  //           {player.isAdmin ? <StarIcon color='gold' /> : ''}
+  //           <Text ml={5}>{player.name}</Text>
+  //         </HStack>
+  //         <Avatar src={player.avatar} background='transparent' />
+  //       </HStack>
+  //       <Box mt={50} mb={100}>
+  //         {props.children}
+  //       </Box>
+  //     </>
+  //   )
+  // }
 
-  const getAppContext = () => {
-    return {
-      player
-    }
-  }
+  // const getAppContext = () => {
+  //   return {
+  //     player
+  //   }
+  // }
 
   return (
-    <AppContext.Provider value={getAppContext()}>
+    // <AppContext.Provider value={getAppContext()}>
       <Box minH='100vh' width='100%'>
         <Switch>
-          <Route exact path="/admin">
+          <Resistance />
+          {/* <Route exact path="/admin">
             <Enter onEnter={checkAuth} isAdminLogin />
           </Route>
 
@@ -166,10 +168,10 @@ function App(props) {
 
           <Route>
             404
-        </Route>
+          </Route> */}
         </Switch>
       </Box>
-    </AppContext.Provider>
+    // </AppContext.Provider>
   );
 }
 
@@ -177,4 +179,4 @@ function Lol() {
   return 'alice is cool'
 }
 
-export default Lol;
+export default App;
